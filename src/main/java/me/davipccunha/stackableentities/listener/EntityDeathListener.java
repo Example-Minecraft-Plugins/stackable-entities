@@ -1,6 +1,6 @@
 package me.davipccunha.stackableentities.listener;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import me.davipccunha.stackableentities.StackableEntitiesPlugin;
 import me.davipccunha.stackableentities.cache.EntityStackCache;
 import me.davipccunha.stackableentities.model.EntityStack;
@@ -9,12 +9,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-@AllArgsConstructor
+// RequiredArgsConstructor is a Lombok annotation that generates a constructor for all final fields.
+// AllArgsConstructor is a Lombok annotation that generates a constructor for all fields.
+@RequiredArgsConstructor
 public class EntityDeathListener implements Listener {
-    StackableEntitiesPlugin plugin;
+
+    // do not use public fields use private final fields with a constructor instead
+    private final StackableEntitiesPlugin plugin;
 
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent event) {
+    private void onEntityDeath(EntityDeathEvent event) { // Listener methods should be private
         Entity entity = event.getEntity();
         if (entity == null) return;
 

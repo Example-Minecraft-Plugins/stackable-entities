@@ -44,12 +44,5 @@ bukkit {
     main = "me.davipccunha.stackableentities.StackableEntitiesPlugin"
     description = "Simple plugin to stack living entities and item drops."
     author = "Davi C"
-
-//    commands {
-//        register("terrain") {
-//            description = "Terrains plugin command."
-//            permission = "terrains.command"
-//            aliases = listOf("terrainplugin", "terrainsplugin", "terrains", "terr")
-//        }
-//    }
+    // command removed
 }

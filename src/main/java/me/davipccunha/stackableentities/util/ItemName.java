@@ -1,13 +1,12 @@
 package me.davipccunha.stackableentities.util;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Item;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 
-@SuppressWarnings("all")
+// RequiredArgsConstructor is a Lombok annotation that generates a constructor for all final fields.
+// Removed supress warnings because it's not needed and not recommended
+@RequiredArgsConstructor
 public enum ItemName {
-
     AIR__0("Ar"),
     STONE__0("Pedra"),
     STONE__1("Granito"),
@@ -706,11 +705,9 @@ public enum ItemName {
     RECORD_11__0("Disco de Música"),
     RECORD_12__0("Disco de Música");
 
-    private String name;
+    private final String name;
 
-    ItemName(String name) {
-        this.name = name;
-    }
+    // Removed unused methods.
 
     public static ItemName valueOf(ItemStack item) {
         try {
@@ -718,42 +715,6 @@ public enum ItemName {
         } catch (Throwable e) {
             return valueOf(item.getType().name() + "__0");
         }
-    }
-
-    public static ItemName valueOf(String name, short durability) {
-        try {
-            return valueOf(name + "__" + durability);
-        } catch (Throwable e) {
-            return valueOf(name + "__0");
-        }
-    }
-
-    public static ItemName valueOf(String name, byte data) {
-        try {
-            return valueOf(name + "__" + data);
-        } catch (Throwable e) {
-            return valueOf(name + "__0");
-        }
-    }
-
-    public static ItemName valueOf(Material material, byte data) {
-        try {
-            return valueOf(material.name() + "__" + data);
-        } catch (Throwable e) {
-            return valueOf(material.name() + "__0");
-        }
-    }
-
-    public static ItemName valueOf(Material material) {
-        return valueOf(material.name() + "__0");
-    }
-
-    public static ItemName valueOf(Item item) {
-        return valueOf(item.getItemStack());
-    }
-
-    public static ItemName valueOf(Block block) {
-        return valueOf(block.getType(), block.getData());
     }
 
     public String getName() {
@@ -764,5 +725,4 @@ public enum ItemName {
     public String toString() {
         return this.name;
     }
-
 }

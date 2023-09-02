@@ -1,10 +1,14 @@
 package me.davipccunha.stackableentities.util;
 
-import org.bukkit.entity.Entity;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.EntityType;
 
+// RequiredArgsConstructor is a Lombok annotation that generates a constructor for all final fields.
+// Getter is a Lombok annotation that generates getters for all fields.
+@RequiredArgsConstructor
+@Getter
 public enum EntityName {
-
     ALLAY("Allay"),
     AREA_EFFECT_CLOUD("Área de Efeito de Poção"),
     ARMOR_STAND("Suporte para Armaduras"),
@@ -130,27 +134,16 @@ public enum EntityName {
     ZOMBIE_VILLAGER("Aldeão Zumbi"),
     ZOMBIFIED_PIGLIN("Piglin Zumbi");
 
-    private String name;
+    private final String name;
 
-    EntityName(String name) {
-        this.name = name;
-    }
-
-    public static EntityName valueOf(Entity entity) {
-        return valueOf(entity.getType());
-    }
+    // Removed unused methods.
 
     public static EntityName valueOf(EntityType entityType) {
         return valueOf(entityType.name());
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     @Override
     public String toString() {
         return this.name;
     }
-
 }
