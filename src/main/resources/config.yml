@@ -1,6 +1,6 @@
-stacking-radius:
-  creatures: 10
-  drops: 10
+stacking-radius: # Radius is capped to 16 blocks
+  creatures: 16
+  drops: 16
 max-stack-size:
-  creatures: 2147483647 # Max value of an integer
-  drops: 11520 # 5 full inventories
+  creatures: 2147483648 # Max value of an integer
+  drops: 23040 # 10 full inventories

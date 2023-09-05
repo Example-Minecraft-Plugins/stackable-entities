@@ -14,31 +14,35 @@ public class EntityDeathListener implements Listener {
     StackableEntitiesPlugin plugin;
 
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent event) {
+    private void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
         if (entity == null) return;
 
+        if (event.getEntity().getKiller() == null) return;
+
+        int entityID = entity.getEntityId();
+
         final EntityStackCache cache = plugin.getEntityStackCache();
 
-        if (!cache.has(entity)) return;
+        if (!cache.has(entityID)) return;
 
-        final EntityStack stack = cache.get(entity);
+        final EntityStack stack = cache.get(entityID);
 
         if (stack.getAmount() <= 1) {
-            cache.remove(entity);
+            cache.remove(entityID);
             return;
         }
 
-        cache.remove(entity);
+        cache.remove(entityID);
 
         Entity newBaseEntity = entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
-        EntityStack newStack = new EntityStack(plugin, newBaseEntity, stack.getAmount() - 1);
+        EntityStack newStack = new EntityStack(cache, newBaseEntity, stack.getAmount() - 1);
 
         // New stack might have been created on world#spawnEntity()
-        if (!cache.has(newBaseEntity)) {
-            cache.add(newBaseEntity, newStack);
+        if (!cache.has(newBaseEntity.getEntityId())) {
+            cache.add(newBaseEntity.getEntityId(), newStack);
         } else {
-            cache.get(newBaseEntity).setAmount(newStack.getAmount());
+            cache.get(newBaseEntity.getEntityId()).setAmount(cache, newBaseEntity, newStack.getAmount());
         }
     }
 }

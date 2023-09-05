@@ -3,6 +3,8 @@ package me.davipccunha.stackableentities;
 import lombok.Getter;
 import me.davipccunha.stackableentities.cache.EntityStackCache;
 import me.davipccunha.stackableentities.listener.*;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -13,29 +15,29 @@ public class StackableEntitiesPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         this.init();
-        getLogger().info("Stackable Entities plugin carregado!");
+        getLogger().info("Stackable Entities plugin loaded!");
     }
 
     public void onDisable() {
-        getLogger().info("Stackable Entities plugin descarregado!");
+        entityStackCache.clear();
+        getLogger().info("Stackable Entities plugin unloaded!");
     }
 
     private void init() {
-        registerListeners();
-        registerCommands();
-
         saveDefaultConfig();
+        registerListeners(
+                new ChunkUnloadListener(this),
+                new CreatureSpawnListener(this),
+                new EntityDeathListener(this),
+                new ItemSpawnListener(this),
+                new PlayerPickupItemListener(this),
+                new ItemMergeListener()
+        );
     }
 
-    private void registerListeners() {
-        getServer().getPluginManager().registerEvents(new ItemSpawnListener(this), this);
-        getServer().getPluginManager().registerEvents(new CreatureSpawnListener(this), this);
-        getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
-        getServer().getPluginManager().registerEvents(new ChunkUnloadListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerPickupItemListener(this), this);
-    }
+    private void registerListeners(Listener... listeners) {
+        PluginManager pluginManager = getServer().getPluginManager();
 
-    private void registerCommands() {
-//        this.getCommand("terrain").setExecutor(new TerrainCommand(this));
+        for (Listener listener : listeners) pluginManager.registerEvents(listener, this);
     }
 }

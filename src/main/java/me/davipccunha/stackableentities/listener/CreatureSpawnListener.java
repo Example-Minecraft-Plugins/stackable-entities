@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import me.davipccunha.stackableentities.StackableEntitiesPlugin;
 import me.davipccunha.stackableentities.cache.EntityStackCache;
 import me.davipccunha.stackableentities.model.EntityStack;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class CreatureSpawnListener implements Listener {
@@ -15,32 +18,48 @@ public class CreatureSpawnListener implements Listener {
     private final StackableEntitiesPlugin plugin;
 
     @EventHandler
-    public void onCreatureSpawn(CreatureSpawnEvent event) {
+    private void onCreatureSpawn(CreatureSpawnEvent event) {
         Entity entity = event.getEntity();
         if (entity == null) return;
 
         final EntityStackCache cache = plugin.getEntityStackCache();
 
-        final int radius = plugin.getConfig().getInt("stacking-radius.creatures");
+        final FileConfiguration config = plugin.getConfig();
 
-        EntityStack[] nearbyStacks = entity.getNearbyEntities(radius, radius, radius).stream()
+        final int radius = Math.min(config.getInt("stacking-radius.creatures"), 16);
+        // Possibly make the max stack size configurable per SpawnReason -> Spawner upgradable to increase max stack size
+        final int maxEntityStackSize = Math.min(config.getInt("max-stack-size.creatures"), Integer.MAX_VALUE);
+
+        List<Entity> nearbyEntities = entity.getNearbyEntities(radius, radius, radius);
+
+        EntityStack[] nearbyIncompleteStacks = nearbyEntities.stream()
                 .filter(e -> e.getType() == entity.getType())
+                .map(Entity::getEntityId)
                 .map(cache::get)
-                .filter(stack -> stack != null && stack.getAmount() > 0)
+                .filter(stack -> stack != null && (stack.getAmount() > 0 && stack.getAmount() < maxEntityStackSize))
                 .toArray(EntityStack[]::new);
 
-        final boolean isThereNearbyStack = nearbyStacks.length > 0;
+        final boolean isThereNearbyStack = nearbyIncompleteStacks.length > 0;
 
         if (!isThereNearbyStack) {
-            cache.add(entity, new EntityStack(plugin, entity, 1));
+            cache.add(entity.getEntityId(), new EntityStack(cache, entity, 1));
             return;
         }
 
-        final EntityStack stack = nearbyStacks[0];
+        final EntityStack stack = nearbyIncompleteStacks[0];
 
-        assert stack != null;
+        if (stack == null) return;
 
-        stack.addAmount(1);
+        // This is the solution to find an entity by its ID since the spawned entity is surely in range of the base entity
+        // This allows us to define an EntityStack with an int (entityID) instead of a whole Entity object
+        Entity baseEntity = nearbyEntities.stream()
+                .filter(e -> e.getEntityId() == stack.getBaseEntityID())
+                .filter(e -> cache.get(e.getEntityId()).getAmount() < maxEntityStackSize)
+                .findFirst().orElse(null);
+
+        if (baseEntity == null) return;
+
+        stack.addAmount(baseEntity, 1);
         event.setCancelled(true);
     }
 }

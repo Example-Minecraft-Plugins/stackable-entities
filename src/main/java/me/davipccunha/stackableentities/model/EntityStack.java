@@ -2,7 +2,6 @@ package me.davipccunha.stackableentities.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.davipccunha.stackableentities.StackableEntitiesPlugin;
 import me.davipccunha.stackableentities.cache.EntityStackCache;
 import me.davipccunha.stackableentities.util.EntityName;
 import me.davipccunha.stackableentities.util.ItemName;
@@ -12,63 +11,62 @@ import org.bukkit.entity.Item;
 
 @Getter
 @Setter
-// TODO: Use NBT to save the amount of items in the stack so that it can be retrieved on server restarts
-// TODO: Change amount from long to int
+// TODO: Use NBT to save the amount of items in the stack so that it can be retrieved on plugin restarts
+// Entities can't have custom NBT tags. Another possible solution?
 public class EntityStack {
-    private final Entity baseEntity;
-    private long amount;
+    private final int baseEntityID;
+    private int amount;
 
-    public EntityStack(StackableEntitiesPlugin plugin, Entity baseEntity, long initialAmount) {
+    public EntityStack(EntityStackCache cache, Entity baseEntity, int initialAmount) {
         baseEntity.setCustomNameVisible(true);
 
-        long amount = Math.max(1, initialAmount);
+        int amount = Math.max(1, initialAmount);
 
-        this.baseEntity = baseEntity;
-        this.setAmount(plugin.getEntityStackCache(), amount);
+        this.baseEntityID = baseEntity.getEntityId();
+        this.setAmount(cache, baseEntity, amount);
     }
 
-    public void setAmount(EntityStackCache cache, long amount) {
+    public void setAmount(EntityStackCache cache, Entity entity, int amount) {
         if (amount <= 0) {
-            if (cache.has(this.baseEntity)) cache.remove(this.baseEntity);
-            this.baseEntity.remove();
+            if (cache.has(this.baseEntityID)) cache.remove(this.baseEntityID);
+            entity.remove();
 
             return;
         }
 
         this.amount = amount;
-        this.updateName();
+        this.updateName(entity);
 
     }
 
-    public void addAmount(long amount) {
+    public void addAmount(Entity entity, int amount) {
         if (this.amount <= 0) return;
 
         this.amount += amount;
-        this.updateName();
+        this.updateName(entity);
     }
 
-    public void removeAmount(EntityStackCache cache, long amount) {
+    public void removeAmount(EntityStackCache cache, Entity entity, int amount) {
         if (amount <= 0 || this.amount <= amount) {
-            if (cache.has(this.baseEntity)) cache.remove(this.baseEntity);
-            this.baseEntity.remove();
+            if (cache.has(entity.getEntityId())) cache.remove(entity.getEntityId());
+            entity.remove();
 
             return;
         }
 
         this.amount -= amount;
-        this.updateName();
+        this.updateName(entity);
     }
 
-    @Override
-    public String toString() {
-        String name = this.baseEntity instanceof Item ?
-                ItemName.valueOf(((Item) this.baseEntity).getItemStack()).toString() :
-                EntityName.valueOf(this.baseEntity.getType()).toString();
+    public String getDisplayName(Entity entity) {
+        String name = entity instanceof Item ?
+                ItemName.valueOf(((Item) entity).getItemStack()).toString() :
+                EntityName.valueOf(entity.getType()).toString();
 
         return ChatColor.WHITE + name + "§a - §f" + this.amount;
     }
 
-    private void updateName() {
-        this.baseEntity.setCustomName(this.toString());
+    private void updateName(Entity entity) {
+        entity.setCustomName(this.getDisplayName(entity));
     }
 }

@@ -21,7 +21,7 @@ public class PlayerPickupItemListener implements Listener {
     private final StackableEntitiesPlugin plugin;
 
     @EventHandler
-    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+    private void onPlayerPickupItem(PlayerPickupItemEvent event) {
         if (event.getItem() == null) return;
 
         final Item item = event.getItem();
@@ -30,12 +30,14 @@ public class PlayerPickupItemListener implements Listener {
         final Inventory inventory = player.getInventory();
         final EntityStackCache cache = plugin.getEntityStackCache();
 
-        if (!cache.has(item)) return;
+        final int entityID = item.getEntityId();
 
-        final EntityStack stack = cache.get(item);
+        if (!cache.has(entityID)) return;
+
+        final EntityStack stack = cache.get(entityID);
 
         if (stack.getAmount() <= 0) {
-            cache.remove(item);
+            cache.remove(entityID);
             return;
         }
 
@@ -47,17 +49,18 @@ public class PlayerPickupItemListener implements Listener {
                 .filter(itemStack -> itemStack != null
                         && itemStack.isSimilar(itemStackCopy)
                         && itemStack.getAmount() < droppedItemMaxStackSize)
-                .reduce(0, (acc, itemStack) -> acc + (droppedItemMaxStackSize - itemStack.getAmount()), Integer::sum);
+                .mapToInt(itemStack -> droppedItemMaxStackSize - itemStack.getAmount())
+                .sum();
 
         maxAmount += emptySlots.size() * droppedItemMaxStackSize;
 
-        int amountToAdd = (int) Math.min(maxAmount, stack.getAmount());
+        int amountToAdd = Math.min(maxAmount, stack.getAmount());
 
-        itemStackCopy.setAmount(amountToAdd); // Not working as expected when maxStackSize is less than 64
+        ItemStack[] stacksToAdd = getStacksToAdd(itemStackCopy, amountToAdd);
 
-        inventory.addItem(itemStackCopy);
+        inventory.addItem(stacksToAdd);
 
-        stack.removeAmount(cache, amountToAdd);
+        stack.removeAmount(cache, item, amountToAdd);
 
         event.setCancelled(true);
     }
@@ -70,5 +73,28 @@ public class PlayerPickupItemListener implements Listener {
         }
 
         return emptySlots;
+    }
+
+    private ItemStack[] getStacksToAdd(ItemStack itemStack, int amount) {
+        final List<ItemStack> stacksToAdd = new ArrayList<>();
+        final int maxStackSize = itemStack.getMaxStackSize();
+
+        final int fullStacks = Math.floorDiv(amount, maxStackSize);
+
+        ItemStack fullStack = itemStack.clone();
+        fullStack.setAmount(maxStackSize);
+
+        for (int i = 0; i < fullStacks; i++)
+            stacksToAdd.add(fullStack);
+
+        final int remainingAmount = amount % maxStackSize;
+
+        if (remainingAmount > 0) {
+            ItemStack itemStackCopy = itemStack.clone();
+            itemStackCopy.setAmount(remainingAmount);
+            stacksToAdd.add(itemStackCopy);
+        }
+
+        return stacksToAdd.toArray(new ItemStack[0]);
     }
 }
