@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import me.davipccunha.stackableentities.StackableEntitiesPlugin;
 import me.davipccunha.stackableentities.cache.EntityStackCache;
 import me.davipccunha.stackableentities.model.EntityStack;
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,6 +37,9 @@ public class EntityDeathListener implements Listener {
         cache.remove(entityID);
 
         Entity newBaseEntity = entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+        if (newBaseEntity instanceof Ageable)
+            ((Ageable) newBaseEntity).setAdult();
+
         EntityStack newStack = new EntityStack(cache, newBaseEntity, stack.getAmount() - 1);
 
         // New stack might have been created on world#spawnEntity()

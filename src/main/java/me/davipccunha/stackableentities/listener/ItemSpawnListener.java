@@ -12,31 +12,36 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class ItemSpawnListener implements Listener {
 
+    final List<Integer> blacklistedEntities = new ArrayList<>();
     private final StackableEntitiesPlugin plugin;
 
     @EventHandler
     private void onItemSpawn(ItemSpawnEvent event) {
-        Item entity = event.getEntity();
+        final Item entity = event.getEntity();
         if (entity == null) return;
+
+        if (blacklistedEntities.contains(entity.getEntityId())) return;
 
         final int initialAmount = entity.getItemStack().getAmount();
 
         final EntityStackCache cache = plugin.getEntityStackCache();
         final FileConfiguration config = plugin.getConfig();
 
-        final int radius = Math.min(plugin.getConfig().getInt("stacking-radius.drops"), 16);
-        // Max stack size not working for drops because Minecraft automatically stacks drops.
-        // Possible solution -> Make it so the ItemStack of a drop is not stackable or set its amount to 64
-        final int maxEntityStackSize = Math.min(config.getInt("max-stack-size.drops"), Integer.MAX_VALUE);
+        final int configRadius = config.getInt("stacking-radius.drops");
+        final int configMaxStackSize = config.getInt("max-stack-size.drops");
 
-        List<Entity> nearbyEntities = entity.getNearbyEntities(radius, radius, radius);
+        final int radius = configRadius >= 1 ? Math.min(configRadius, 16) : 1;
+        final int maxEntityStackSize = Math.max(configMaxStackSize, 16);
 
-        EntityStack[] nearbyStacks = nearbyEntities.stream()
+        final List<Entity> nearbyEntities = entity.getNearbyEntities(radius, radius, radius);
+
+        final EntityStack[] nearbyStacks = nearbyEntities.stream()
                 .filter(e -> e.getType() == EntityType.DROPPED_ITEM)
                 .filter(i -> ((Item) i).getItemStack().isSimilar(entity.getItemStack()))
                 .map(Entity::getEntityId)
@@ -48,6 +53,7 @@ public class ItemSpawnListener implements Listener {
 
         final int entityID = entity.getEntityId();
 
+        // Stack limit is not respected when the stack amount + the item dropped amount is greater than the stack limit
         if (!isThereNearbyStack) {
             entity.getItemStack().setAmount(1);
             cache.add(entityID, new EntityStack(cache, entity, initialAmount));
@@ -55,12 +61,11 @@ public class ItemSpawnListener implements Listener {
         }
 
         final EntityStack stack = nearbyStacks[0];
-
         if (stack == null) return;
 
         // This is the solution to find an entity by its ID since the spawned entity is surely in range of the base entity
-        // This allows us to define an EntityStack with an entityID instead of a whole Entity object
-        Entity baseEntity = nearbyEntities.stream()
+        // This allows us to define an EntityStack with an int entityID instead of a whole Entity object
+        final Entity baseEntity = nearbyEntities.stream()
                 .filter(e -> e.getEntityId() == stack.getBaseEntityID())
                 .filter(e -> cache.get(e.getEntityId()).getAmount() < maxEntityStackSize)
                 .findFirst().orElse(null);

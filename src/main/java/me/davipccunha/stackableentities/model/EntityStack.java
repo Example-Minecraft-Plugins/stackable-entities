@@ -11,8 +11,6 @@ import org.bukkit.entity.Item;
 
 @Getter
 @Setter
-// TODO: Use NBT to save the amount of items in the stack so that it can be retrieved on plugin restarts
-// Entities can't have custom NBT tags. Another possible solution?
 public class EntityStack {
     private final int baseEntityID;
     private int amount;
