@@ -6,6 +6,8 @@ import me.davipccunha.stackableentities.cache.EntityStackCache;
 import me.davipccunha.stackableentities.model.EntityStack;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Slime;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -18,7 +20,6 @@ public class EntityDeathListener implements Listener {
     private void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
         if (entity == null) return;
-
         if (event.getEntity().getKiller() == null) return;
 
         int entityID = entity.getEntityId();
@@ -37,8 +38,12 @@ public class EntityDeathListener implements Listener {
         cache.remove(entityID);
 
         Entity newBaseEntity = entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
-        if (newBaseEntity instanceof Ageable)
-            ((Ageable) newBaseEntity).setAdult();
+
+        if (newBaseEntity instanceof Ageable) ((Ageable) newBaseEntity).setAdult();
+        if (newBaseEntity instanceof Zombie) ((Zombie) newBaseEntity).setBaby(false);
+
+        // Size must be set to 1 otherwise the stack amount will increase infinitely
+        if (newBaseEntity instanceof Slime) ((Slime) newBaseEntity).setSize(1);
 
         EntityStack newStack = new EntityStack(cache, newBaseEntity, stack.getAmount() - 1);
 

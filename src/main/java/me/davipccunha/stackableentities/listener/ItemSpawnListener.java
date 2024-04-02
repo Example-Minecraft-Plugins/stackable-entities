@@ -12,21 +12,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class ItemSpawnListener implements Listener {
 
-    final List<Integer> blacklistedEntities = new ArrayList<>();
     private final StackableEntitiesPlugin plugin;
 
     @EventHandler
     private void onItemSpawn(ItemSpawnEvent event) {
         final Item entity = event.getEntity();
         if (entity == null) return;
-
-        if (blacklistedEntities.contains(entity.getEntityId())) return;
 
         final int initialAmount = entity.getItemStack().getAmount();
 
