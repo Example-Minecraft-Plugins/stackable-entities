@@ -59,7 +59,7 @@ public class ItemSpawnListener implements Listener {
         final EntityStack stack = nearbyStacks[0];
         if (stack == null) return;
 
-        // This is the solution to find an entity by its ID since the spawned entity is surely in range of the base entity
+        // This is a solution to find an entity by its ID since at this point the spawned entity is surely in range of the base entity
         // This allows us to define an EntityStack with an int entityID instead of a whole Entity object
         final Entity baseEntity = nearbyEntities.stream()
                 .filter(e -> e.getEntityId() == stack.getBaseEntityID())

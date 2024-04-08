@@ -54,9 +54,9 @@ public class PlayerPickupItemListener implements Listener {
 
         maxAmount += emptySlots.size() * droppedItemMaxStackSize;
 
-        int amountToAdd = Math.min(maxAmount, stack.getAmount());
+        long amountToAdd = Math.min(maxAmount, stack.getAmount());
 
-        ItemStack[] stacksToAdd = getStacksToAdd(itemStackCopy, amountToAdd);
+        ItemStack[] stacksToAdd = this.getStacksToAdd(itemStackCopy, amountToAdd);
 
         inventory.addItem(stacksToAdd);
 
@@ -75,11 +75,11 @@ public class PlayerPickupItemListener implements Listener {
         return emptySlots;
     }
 
-    private ItemStack[] getStacksToAdd(ItemStack itemStack, int amount) {
+    private ItemStack[] getStacksToAdd(ItemStack itemStack, long amount) {
         final List<ItemStack> stacksToAdd = new ArrayList<>();
         final int maxStackSize = itemStack.getMaxStackSize();
 
-        final int fullStacks = Math.floorDiv(amount, maxStackSize);
+        final long fullStacks = Math.floorDiv(amount, maxStackSize);
 
         ItemStack fullStack = itemStack.clone();
         fullStack.setAmount(maxStackSize);
@@ -87,11 +87,11 @@ public class PlayerPickupItemListener implements Listener {
         for (int i = 0; i < fullStacks; i++)
             stacksToAdd.add(fullStack);
 
-        final int remainingAmount = amount % maxStackSize;
+        final long remainingAmount = amount % maxStackSize;
 
         if (remainingAmount > 0) {
             ItemStack itemStackCopy = itemStack.clone();
-            itemStackCopy.setAmount(remainingAmount);
+            itemStackCopy.setAmount((int) remainingAmount);
             stacksToAdd.add(itemStackCopy);
         }
 

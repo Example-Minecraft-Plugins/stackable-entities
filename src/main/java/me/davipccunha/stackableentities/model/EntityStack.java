@@ -13,18 +13,18 @@ import org.bukkit.entity.Item;
 @Setter
 public class EntityStack {
     private final int baseEntityID;
-    private int amount;
+    private long amount;
 
-    public EntityStack(EntityStackCache cache, Entity baseEntity, int initialAmount) {
+    public EntityStack(EntityStackCache cache, Entity baseEntity, long initialAmount) {
         baseEntity.setCustomNameVisible(true);
 
-        int amount = Math.max(1, initialAmount);
+        long amount = Math.max(1, initialAmount);
 
         this.baseEntityID = baseEntity.getEntityId();
         this.setAmount(cache, baseEntity, amount);
     }
 
-    public void setAmount(EntityStackCache cache, Entity entity, int amount) {
+    public void setAmount(EntityStackCache cache, Entity entity, long amount) {
         if (amount <= 0) {
             if (cache.has(this.baseEntityID)) cache.remove(this.baseEntityID);
             entity.remove();
@@ -37,14 +37,14 @@ public class EntityStack {
 
     }
 
-    public void addAmount(Entity entity, int amount) {
+    public void addAmount(Entity entity, long amount) {
         if (this.amount <= 0) return;
 
         this.amount += amount;
         this.updateName(entity);
     }
 
-    public void removeAmount(EntityStackCache cache, Entity entity, int amount) {
+    public void removeAmount(EntityStackCache cache, Entity entity, long amount) {
         if (amount <= 0 || this.amount <= amount) {
             if (cache.has(entity.getEntityId())) cache.remove(entity.getEntityId());
             entity.remove();

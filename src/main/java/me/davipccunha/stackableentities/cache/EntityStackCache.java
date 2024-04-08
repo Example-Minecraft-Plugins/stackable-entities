@@ -13,7 +13,7 @@ public class EntityStackCache {
     }
 
     public void remove(int entityID) {
-        if (!entityStacks.containsKey(entityID)) return;
+        if (!this.has(entityID)) return;
 
         entityStacks.remove(entityID);
     }

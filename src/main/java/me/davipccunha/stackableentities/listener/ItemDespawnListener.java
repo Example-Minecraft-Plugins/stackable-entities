@@ -13,12 +13,12 @@ public class ItemDespawnListener implements Listener {
     private final StackableEntitiesPlugin plugin;
 
     @EventHandler(priority = EventPriority.MONITOR)
-
     private void onItemDespawn(ItemDespawnEvent event) {
         if (event.getEntity() == null) return;
 
         final EntityStackCache cache = plugin.getEntityStackCache();
         final int entityID = event.getEntity().getEntityId();
-        if (cache.has(entityID)) cache.remove(entityID);
+
+        cache.remove(entityID);
     }
 }

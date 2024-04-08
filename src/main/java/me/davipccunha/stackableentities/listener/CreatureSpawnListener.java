@@ -7,6 +7,7 @@ import me.davipccunha.stackableentities.model.EntityStack;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -17,7 +18,7 @@ public class CreatureSpawnListener implements Listener {
 
     private final StackableEntitiesPlugin plugin;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     private void onCreatureSpawn(CreatureSpawnEvent event) {
         final Entity entity = event.getEntity();
         if (entity == null) return;
