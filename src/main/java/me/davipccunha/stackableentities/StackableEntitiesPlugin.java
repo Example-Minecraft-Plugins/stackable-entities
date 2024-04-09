@@ -31,7 +31,7 @@ public class StackableEntitiesPlugin extends JavaPlugin {
                 new EntityDeathListener(this),
                 new ItemSpawnListener(this),
                 new PlayerPickupItemListener(this),
-                new ItemMergeListener(),
+                new ItemMergeListener(this),
                 new ItemDespawnListener(this)
         );
     }

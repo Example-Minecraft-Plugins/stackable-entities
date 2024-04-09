@@ -24,12 +24,12 @@ public class CreatureSpawnListener implements Listener {
         if (entity == null) return;
 
         final EntityStackCache cache = plugin.getEntityStackCache();
-
         final FileConfiguration config = plugin.getConfig();
 
         final int radius = Math.min(config.getInt("stacking-radius.creatures"), 16);
-        // Possibly make the max stack size configurable per SpawnReason -> Spawner upgradable to increase max stack size
-        final int maxEntityStackSize = Math.min(config.getInt("max-stack-size.creatures"), Integer.MAX_VALUE);
+
+        // Possibly make the max stack size configurable according to SpawnReason -> Spawner upgradable to increase max stack size
+        final long maxEntityStackSize = Math.min(config.getLong("max-stack-size.creatures"), Long.MAX_VALUE);
 
         final List<Entity> nearbyEntities = entity.getNearbyEntities(radius, radius, radius);
 
@@ -51,11 +51,10 @@ public class CreatureSpawnListener implements Listener {
 
         if (stack == null) return;
 
-        // This is the solution to find an entity by its ID since the spawned entity is surely in range of the base entity
+        // This is a solution to find an entity by its ID since at this point the spawned entity is surely in range of the base entity
         // This allows us to define an EntityStack with an int (entityID) instead of a whole Entity object
         final Entity baseEntity = nearbyEntities.stream()
                 .filter(e -> e.getEntityId() == stack.getBaseEntityID())
-                .filter(e -> cache.get(e.getEntityId()).getAmount() < maxEntityStackSize)
                 .findFirst().orElse(null);
 
         if (baseEntity == null) return;

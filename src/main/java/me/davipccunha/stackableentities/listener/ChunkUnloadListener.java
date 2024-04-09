@@ -22,7 +22,7 @@ public class ChunkUnloadListener implements Listener {
         Chunk chunk = event.getChunk();
 
         for (Entity entity : chunk.getEntities()) {
-            if (cache.has(entity.getEntityId())) cache.remove(entity.getEntityId());
+            cache.remove(entity.getEntityId());
         }
     }
 }

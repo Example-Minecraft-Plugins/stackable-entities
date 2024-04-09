@@ -67,4 +67,9 @@ public class EntityStack {
     private void updateName(Entity entity) {
         entity.setCustomName(this.getDisplayName(entity));
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s - %d", this.baseEntityID, this.amount);
+    }
 }

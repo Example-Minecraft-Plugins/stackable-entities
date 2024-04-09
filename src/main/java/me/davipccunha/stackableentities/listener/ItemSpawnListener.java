@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 
@@ -19,7 +20,7 @@ public class ItemSpawnListener implements Listener {
 
     private final StackableEntitiesPlugin plugin;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     private void onItemSpawn(ItemSpawnEvent event) {
         final Item entity = event.getEntity();
         if (entity == null) return;
@@ -30,10 +31,12 @@ public class ItemSpawnListener implements Listener {
         final FileConfiguration config = plugin.getConfig();
 
         final int configRadius = config.getInt("stacking-radius.drops");
-        final int configMaxStackSize = config.getInt("max-stack-size.drops");
+        final long configMaxStackSize = config.getLong("max-stack-size.drops");
 
         final int radius = configRadius >= 1 ? Math.min(configRadius, 16) : 1;
-        final int maxEntityStackSize = Math.max(configMaxStackSize, 16);
+        // FIX: The minimum stack size is currently 64 to avoid bugs -> if a player drops more than 64 items, when
+        //      trying to split it, spawning a new entity also triggers this event infinitely
+        final long maxEntityStackSize = Math.max(configMaxStackSize, 64);
 
         final List<Entity> nearbyEntities = entity.getNearbyEntities(radius, radius, radius);
 
@@ -49,7 +52,7 @@ public class ItemSpawnListener implements Listener {
 
         final int entityID = entity.getEntityId();
 
-        // Stack limit is not respected when the stack amount + the item dropped amount is greater than the stack limit
+        // FIX: Stack limit is not respected when the stack amount + the item dropped amount is greater than the stack limit
         if (!isThereNearbyStack) {
             entity.getItemStack().setAmount(1);
             cache.add(entityID, new EntityStack(cache, entity, initialAmount));
@@ -63,7 +66,6 @@ public class ItemSpawnListener implements Listener {
         // This allows us to define an EntityStack with an int entityID instead of a whole Entity object
         final Entity baseEntity = nearbyEntities.stream()
                 .filter(e -> e.getEntityId() == stack.getBaseEntityID())
-                .filter(e -> cache.get(e.getEntityId()).getAmount() < maxEntityStackSize)
                 .findFirst().orElse(null);
 
         if (baseEntity == null) return;

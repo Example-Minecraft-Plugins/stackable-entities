@@ -41,7 +41,7 @@ public class PlayerPickupItemListener implements Listener {
             return;
         }
 
-        final List<Integer> emptySlots = getEmptySlots(inventory);
+        final List<Integer> emptySlots = this.getEmptySlots(inventory);
 
         ItemStack itemStackCopy = item.getItemStack().clone();
 

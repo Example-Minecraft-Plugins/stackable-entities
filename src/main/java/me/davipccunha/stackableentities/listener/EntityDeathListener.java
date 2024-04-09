@@ -20,6 +20,8 @@ public class EntityDeathListener implements Listener {
     private void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
         if (entity == null) return;
+
+        // Can be removed => Big stacks will take too long to get removed
         if (event.getEntity().getKiller() == null) return;
 
         int entityID = entity.getEntityId();

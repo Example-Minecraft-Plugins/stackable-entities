@@ -14,7 +14,6 @@ public class NBTHandler {
         nmsEntity.c(compound);
         nmsEntity.f(compound);
 
-        System.out.println(nmsEntity.getNBTTag());
         if (nmsEntity.getNBTTag() != null) System.out.println(nmsEntity.getNBTTag().getString(key));
         return nmsEntity.getBukkitEntity();
     }
