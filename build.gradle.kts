@@ -21,6 +21,7 @@ dependencies {
     compileOnly("net.md-5:bungeecord-chat:1.8-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.28")
     annotationProcessor("org.projectlombok:lombok:1.18.28")
+    compileOnly(fileTree("D:\\Local Minecraft Server\\plugins") { include("bukkit-utils.jar") })
 }
 
 tasks.withType<JavaCompile> {
@@ -42,6 +43,7 @@ bukkit {
     apiVersion = "1.8"
     version = "${project.version}"
     main = "me.davipccunha.stackableentities.StackableEntitiesPlugin"
+    depend = listOf("bukkit-utils")
     description = "Simple plugin to stack living entities and item drops."
     author = "Davi C"
 }
