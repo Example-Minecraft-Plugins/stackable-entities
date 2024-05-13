@@ -20,7 +20,7 @@ public class ItemSpawnListener implements Listener {
 
     private final StackableEntitiesPlugin plugin;
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onItemSpawn(ItemSpawnEvent event) {
         final Item entity = event.getEntity();
         if (entity == null) return;

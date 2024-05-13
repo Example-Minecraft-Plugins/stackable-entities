@@ -19,7 +19,7 @@ import java.util.List;
 public class ItemMergeListener implements Listener {
     private final StackableEntitiesPlugin plugin;
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onItemMerge(ItemMergeEvent event) {
         // Prevents item merge which bugs the plugin since an EntityStack is represented by an Item with a set amount of 1
         event.setCancelled(true);

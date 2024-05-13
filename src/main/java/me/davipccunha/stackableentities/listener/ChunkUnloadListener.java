@@ -17,9 +17,9 @@ public class ChunkUnloadListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onChunkUnload(ChunkUnloadEvent event) {
-        EntityStackCache cache = plugin.getEntityStackCache();
+        final EntityStackCache cache = plugin.getEntityStackCache();
 
-        Chunk chunk = event.getChunk();
+        final Chunk chunk = event.getChunk();
 
         for (Entity entity : chunk.getEntities()) {
             cache.remove(entity.getEntityId());

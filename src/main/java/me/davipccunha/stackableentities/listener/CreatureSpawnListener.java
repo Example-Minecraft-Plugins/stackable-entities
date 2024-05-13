@@ -18,7 +18,7 @@ public class CreatureSpawnListener implements Listener {
 
     private final StackableEntitiesPlugin plugin;
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onCreatureSpawn(CreatureSpawnEvent event) {
         final Entity entity = event.getEntity();
         if (entity == null) return;

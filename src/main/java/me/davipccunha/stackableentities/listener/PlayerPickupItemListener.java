@@ -7,6 +7,7 @@ import me.davipccunha.stackableentities.model.EntityStack;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
@@ -20,7 +21,7 @@ import java.util.List;
 public class PlayerPickupItemListener implements Listener {
     private final StackableEntitiesPlugin plugin;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onPlayerPickupItem(PlayerPickupItemEvent event) {
         if (event.getItem() == null) return;
 

@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -16,7 +17,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 public class EntityDeathListener implements Listener {
     StackableEntitiesPlugin plugin;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
         if (entity == null) return;
